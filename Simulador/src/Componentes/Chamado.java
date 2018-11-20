@@ -5,31 +5,16 @@ import java.util.Date;
 
 public class Chamado {
     
-    private Date dataAbertura;
-    private Date dataEncerramento;
+    private int tempo;
     private Setor setor;
     private Analista analista;
     private Boolean urgente;
     
-    public Chamado(Setor setor, Boolean urgente) {
+    public Chamado(Setor setor, Boolean urgente, Analista analista, int tempo) {
         this.setor = setor;
         this.urgente = urgente;
-    }
-
-    public Date getDataAbertura() {
-        return dataAbertura;
-    }
-
-    public void setDataAbertura(Date dataAbertura) {
-        this.dataAbertura = dataAbertura;
-    }
-
-    public Date getDataEncerramento() {
-        return dataEncerramento;
-    }
-
-    public void setDataEncerramento(Date dataEncerramento) {
-        this.dataEncerramento = dataEncerramento;
+        this.analista = analista;
+        this.tempo = tempo;
     }
 
     public Setor getSetor() {
@@ -54,6 +39,14 @@ public class Chamado {
 
     public void setUrgente(Boolean urgente) {
         this.urgente = urgente;
+    }
+
+    public int getTempo() {
+        return tempo;
+    }
+
+    public void setTempo(int tempo) {
+        this.tempo = tempo;
     }
        
 }
