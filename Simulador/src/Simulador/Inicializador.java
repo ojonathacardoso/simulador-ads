@@ -810,4 +810,27 @@ public class Inicializador {
         this.probabilidadesTempo = probabilidadesTempo;
     }
     
+    public Analista getAnalistaProbabilidade(Setor setor, double probabilidade) {
+        
+        double soma = 0;
+        
+        for (int x = 0; x <= probabilidadesAnalista.size(); x++) {
+
+            ProbabilidadeAnalista probAnalista = (ProbabilidadeAnalista) probabilidadesAnalista.get(x);
+            
+            if(probAnalista.getSetor().equals(setor))
+            {
+                soma += probAnalista.getProbabilidade();
+                
+                if(probabilidade <= soma) {
+                    //System.out.println("CHAVE ENCONTRADA: "+chaveAtual);
+                    return probAnalista.getAnalista();
+                }
+            }           
+
+        }
+        
+        return null;
+    }
+    
 }
