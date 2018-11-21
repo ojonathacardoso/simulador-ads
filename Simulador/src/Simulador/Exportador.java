@@ -24,7 +24,7 @@ public class Exportador {
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd_MM_yyyy_HH_mm_ss");
             LocalDateTime now = LocalDateTime.now();
             
-            String fileName = System.getProperty("user.home")+"/dados_"+dtf.format(now)+".csv";
+            String fileName = System.getProperty("user.home")+"/simulador-ads/dados_"+dtf.format(now)+".csv";
             
             fileWriter = new FileWriter(fileName);
 

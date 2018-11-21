@@ -181,9 +181,7 @@ public class Simulador {
         int quantSoma = 0;
         int quantChamados = 0;
         String data;
-        
-        System.out.println("------------------------------");
-        
+
         DateFormat df = new SimpleDateFormat ("dd/MM/yyyy");
         df.setLenient (false);
         boolean valida = false;
@@ -198,10 +196,10 @@ public class Simulador {
             }
         } while (valida == false);
         
-        this.inicializador.iniciarDatasAnalistas(data);
-        
         System.out.println("------------------------------");
         
+        this.inicializador.iniciarDatasAnalistas(data);
+
         if(quantidades.size() > 0) {
             for ( Object setor : quantidades.keySet()) {
                 setores.add( setor.toString() );
@@ -252,8 +250,6 @@ public class Simulador {
         int quantChamados = 0;
         String data;
         
-        System.out.println("------------------------------");
-        
         DateFormat df = new SimpleDateFormat ("dd/MM/yyyy");
         df.setLenient (false);
         boolean valida = false;
@@ -268,9 +264,9 @@ public class Simulador {
             }
         } while (valida == false);
         
-        this.inicializador.iniciarDatasAnalistas(data);
-        
         System.out.println("------------------------------");
+        
+        this.inicializador.iniciarDatasAnalistas(data);
         
         if(quantidades.size() > 0) {
             for ( Object setor : quantidades.keySet()) {

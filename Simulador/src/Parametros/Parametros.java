@@ -9,10 +9,10 @@ import java.util.Properties;
 
 public class Parametros {
 
-    private File porcentagemFixa = new File("src/Parametros/PorcentagemFixa.txt");
-    private File porcentagemManual = new File("src/Parametros/PorcentagemManual.txt");
-    private File quantidade = new File("src/Parametros/Quantidade.txt");
-    private File urgencia = new File("src/Parametros/Urgencia.txt");
+    private File porcentagemFixa;
+    private File porcentagemManual;
+    private File quantidade;
+    private File urgencia;
     
     private Properties porcentagemFixaProp = new Properties();
     private Properties porcentagemManualProp = new Properties();
@@ -21,23 +21,18 @@ public class Parametros {
     
     public Parametros() throws FileNotFoundException, IOException {
         
+        String diretorio = System.getProperty("user.home")+"/simulador-ads/";
+        
+        porcentagemFixa = new File(diretorio + "porcentagem-fixa.txt");
+        porcentagemManual = new File(diretorio + "porcentagem-manual.txt");
+        quantidade = new File(diretorio + "quantidade.txt");
+        urgencia = new File(diretorio + "urgencia.txt");
+        
         porcentagemFixaProp.load(new FileInputStream(porcentagemFixa));
         porcentagemManualProp.load(new FileInputStream(porcentagemManual));
         quantidadeProp.load(new FileInputStream(quantidade));
         urgenciaProp.load(new FileInputStream(urgencia));
     }
-    
-    /*public double getParametroPorcentagemFixa(String parametro) {
-        return Double.parseDouble(getPorcentagemFixaProp().getProperty(parametro) );
-    }
-    
-    public double getParametroPorcentagemManual(String parametro) {
-        return Double.parseDouble(getPorcentagemManualProp().getProperty(parametro) );
-    }
-    
-    public int getParametroQuantidade(String parametro) {
-        return Integer.parseInt(getQuantidadeProp().getProperty(parametro) );
-    }*/
 
     public Properties getPorcentagemFixaProp() {
         return porcentagemFixaProp;
