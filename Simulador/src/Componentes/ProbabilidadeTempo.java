@@ -30,5 +30,21 @@ public class ProbabilidadeTempo {
     public void setAnalista(Analista analista) {
         this.analista = analista;
     }
+
+    public double getProbUrgente() {
+        return probUrgente;
+    }
+
+    public void setProbUrgente(double probUrgente) {
+        this.probUrgente = probUrgente;
+    }
+
+    public double getProbNaoUrgente() {
+        return probNaoUrgente;
+    }
+
+    public void setProbNaoUrgente(double probNaoUrgente) {
+        this.probNaoUrgente = probNaoUrgente;
+    }
     
 }

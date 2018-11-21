@@ -9,44 +9,44 @@ public class Chamado {
     private Setor setor;
     private Analista analista;
     private Boolean urgente;
+    private Date dataInicial;
+    private Date dataFinal;
     
-    public Chamado(Setor setor, Boolean urgente, Analista analista, int tempo) {
+    public Chamado(Setor setor, Boolean urgente, Analista analista, int tempo, Date[] datas) {
         this.setor = setor;
         this.urgente = urgente;
         this.analista = analista;
         this.tempo = tempo;
+        this.dataInicial = datas[0];
+        this.dataFinal = datas[1];
     }
 
     public Setor getSetor() {
         return setor;
     }
 
-    public void setSetor(Setor setor) {
-        this.setor = setor;
-    }
-
     public Analista getAnalista() {
         return analista;
-    }
-
-    public void setAnalista(Analista analista) {
-        this.analista = analista;
     }
 
     public Boolean getUrgente() {
         return urgente;
     }
-
-    public void setUrgente(Boolean urgente) {
-        this.urgente = urgente;
+    
+    public String getUrgenteString() {
+        return urgente.equals(Boolean.TRUE) ? "Sim" : "Nao";
     }
 
     public int getTempo() {
         return tempo;
     }
 
-    public void setTempo(int tempo) {
-        this.tempo = tempo;
+    public Date getDataInicial() {
+        return dataInicial;
     }
-       
+
+    public Date getDataFinal() {
+        return dataFinal;
+    }
+    
 }

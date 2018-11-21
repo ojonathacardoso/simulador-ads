@@ -3,11 +3,14 @@ package Simulador;
 
 import Componentes.Analista;
 import Componentes.Chamado;
-import Componentes.ProbabilidadeAnalista;
 import Componentes.Setor;
 import Parametros.Parametros;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,7 +30,7 @@ public class Simulador {
     
     Scanner scanner = new Scanner(System.in);
     
-    public Simulador() throws IOException {
+    public Simulador() throws IOException, ParseException {
         
         this.inicializador = new Inicializador();
         this.parametros = new Parametros();        
@@ -52,18 +55,42 @@ public class Simulador {
                     break;
             };           
         }
+
+        System.out.println("------------------------------");
         
+        Exportador.criarArquivo(this.chamados);
         
     }
      
-    public void criarChamadosPorcentagemFixa() {
+    public void criarChamadosPorcentagemFixa() throws ParseException {
 
         int quantChamados;
+        String data;
                 
         do {
             System.out.print("Informe quantos chamados o sistema criará: ");
             quantChamados = scanner.nextInt();            
         } while (quantChamados < 0);
+        
+        System.out.println("------------------------------");
+        
+        DateFormat df = new SimpleDateFormat ("dd/MM/yyyy");
+        df.setLenient (false);
+        boolean valida = false;
+        do {
+            System.out.print("Informe a data inicial, no formato DD/MM/YYYY: ");
+            data = scanner.nextLine(); 
+            try {
+                df.parse (data);
+                valida = true;
+            } catch (ParseException ex) {
+                valida = false;
+            }
+        } while (valida == false);
+        
+        this.inicializador.iniciarDatasAnalistas(data);
+        
+        System.out.println("------------------------------");
 
         for(int x = 0; x < quantChamados; x++) {
             double numero = Math.random() * 100;
@@ -71,13 +98,15 @@ public class Simulador {
             String setorString = this.obterSetorPorcentagem(1, numero);            
             Setor setor = this.inicializador.getSetorNome(setorString.replace(".", " "));
             
-            //System.out.println(setor.getNome());
             Boolean urgencia = this.obterUrgencia();
             
             Analista analista = this.obterAnalista(setor);
-            //int tempo = this.obterTempo(analista, urgencia);
-            int tempo = 0;
-            this.chamados.add(new Chamado(setor, urgencia, analista, tempo));
+            
+            int tempo = this.obterTempo(analista, urgencia);
+            
+            Date[] datas = this.obterDatas(analista, tempo);
+                
+            this.chamados.add(new Chamado(setor, urgencia, analista, tempo, datas));
             
         }
         
@@ -85,29 +114,52 @@ public class Simulador {
         
     }
     
-    public void criarChamadosPorcentagemManual() {
+    public void criarChamadosPorcentagemManual() throws ParseException {
         
         if(this.testarPorcentagem(2)) {
             int quantChamados;
+            String data;
 
             do {
                 System.out.print("Informe quantos chamados o sistema criará: ");
                 quantChamados = scanner.nextInt();            
             } while (quantChamados < 0);
 
+            System.out.println("------------------------------");
+            
+            DateFormat df = new SimpleDateFormat ("dd/MM/yyyy");
+            df.setLenient (false);
+            boolean valida = false;
+            do {
+                System.out.print("Informe a data inicial, no formato DD/MM/YYYY: ");
+                data = scanner.nextLine(); 
+                try {
+                    df.parse (data);
+                    valida = true;
+                } catch (ParseException ex) {
+                    valida = false;
+                }
+            } while (valida == false);
+            
+            this.inicializador.iniciarDatasAnalistas(data);
+            
+            System.out.println("------------------------------");
+            
             for(int x = 0; x < quantChamados; x++) {
                 double numero = Math.random() * 100;
 
                 String setorString = this.obterSetorPorcentagem(2, numero);            
                 Setor setor = this.inicializador.getSetorNome(setorString.replace(".", " "));
 
-                //System.out.println(setor.getNome());
                 Boolean urgencia = this.obterUrgencia();
                 
                 Analista analista = this.obterAnalista(setor);
-                //int tempo = this.obterTempo(analista, urgencia);
-                int tempo = 0;
-                this.chamados.add(new Chamado(setor, urgencia, analista, tempo));
+                
+                int tempo = this.obterTempo(analista, urgencia);
+                
+                Date[] datas = this.obterDatas(analista, tempo);
+                
+                this.chamados.add(new Chamado(setor, urgencia, analista, tempo, datas));
                 
             }
 
@@ -120,14 +172,35 @@ public class Simulador {
         
     }
     
-    public void criarChamadosQuantidadeAleatoria() {
+    public void criarChamadosQuantidadeAleatoria() throws ParseException {
         
         Map<String, Integer> quantidades = this.testarQuantidade();
-        ArrayList setores = new ArrayList<String>();
+        ArrayList setores = new ArrayList();
         Random aleatorio = new Random(); 
         
         int quantSoma = 0;
         int quantChamados = 0;
+        String data;
+        
+        System.out.println("------------------------------");
+        
+        DateFormat df = new SimpleDateFormat ("dd/MM/yyyy");
+        df.setLenient (false);
+        boolean valida = false;
+        do {
+            System.out.print("Informe a data inicial, no formato DD/MM/YYYY: ");
+            data = scanner.nextLine(); 
+            try {
+                df.parse (data);
+                valida = true;
+            } catch (ParseException ex) {
+                valida = false;
+            }
+        } while (valida == false);
+        
+        this.inicializador.iniciarDatasAnalistas(data);
+        
+        System.out.println("------------------------------");
         
         if(quantidades.size() > 0) {
             for ( Object setor : quantidades.keySet()) {
@@ -143,16 +216,20 @@ public class Simulador {
                 int quantAtual = quantidades.get( setorString );
                 if (quantAtual > 0) {
                     Setor setor = this.inicializador.getSetorNome(setorString.replace(".", " "));
+                    
                     Boolean urgencia = this.obterUrgencia();
+                    
                     Analista analista = this.obterAnalista(setor);
-                //int tempo = this.obterTempo(analista, urgencia);
-                int tempo = 0;
-                    this.chamados.add(new Chamado(setor, urgencia, analista, tempo));
+                    
+                    int tempo = this.obterTempo(analista, urgencia);
+                    
+                    Date[] datas = this.obterDatas(analista, tempo);
+                
+                    this.chamados.add(new Chamado(setor, urgencia, analista, tempo, datas));
                     
                     quantAtual--;                    
                     quantidades.replace(setorString, quantAtual);
                     quantSoma--;
-                    //System.out.println(setorString);
                 }
                 
             }     
@@ -166,13 +243,34 @@ public class Simulador {
 
     }
     
-    public void criarChamadosQuantidadeOrdem() {
+    public void criarChamadosQuantidadeOrdem() throws ParseException {
          
         Map<String, Integer> quantidades = this.testarQuantidade();
-        ArrayList setores = new ArrayList<String>();
+        ArrayList setores = new ArrayList();
         
         int quantSoma = 0;
         int quantChamados = 0;
+        String data;
+        
+        System.out.println("------------------------------");
+        
+        DateFormat df = new SimpleDateFormat ("dd/MM/yyyy");
+        df.setLenient (false);
+        boolean valida = false;
+        do {
+            System.out.print("Informe a data inicial, no formato DD/MM/YYYY: ");
+            data = scanner.nextLine(); 
+            try {
+                df.parse (data);
+                valida = true;
+            } catch (ParseException ex) {
+                valida = false;
+            }
+        } while (valida == false);
+        
+        this.inicializador.iniciarDatasAnalistas(data);
+        
+        System.out.println("------------------------------");
         
         if(quantidades.size() > 0) {
             for ( Object setor : quantidades.keySet()) {
@@ -188,12 +286,16 @@ public class Simulador {
                 
                 for(int y = 0; y < totalSetor; y++) {
                     Setor setor = this.inicializador.getSetorNome(setorString.replace(".", " "));
+                    
                     Boolean urgencia = this.obterUrgencia();
+                    
                     Analista analista = this.obterAnalista(setor);
-                    //int tempo = this.obterTempo(analista, urgencia);
-                    int tempo = 0;  
-                    this.chamados.add(new Chamado(setor, urgencia, analista, tempo));
-                    //System.out.println(setorString);
+                    
+                    int tempo = this.obterTempo(analista, urgencia);
+                    
+                    Date[] datas = this.obterDatas(analista, tempo);
+                
+                    this.chamados.add(new Chamado(setor, urgencia, analista, tempo, datas));
                 }
             }     
             
@@ -287,8 +389,6 @@ public class Simulador {
             soma += valor;
         }
         
-     //   System.out.println(soma);
-        
         if(soma == 100.00)
             return true;
         else
@@ -298,11 +398,29 @@ public class Simulador {
     
     public Analista obterAnalista(Setor setor) {
         
-        double numero = Math.random() * 100;  
+        double probabilidade = Math.random();  
             
-        Analista analista = this.inicializador.getAnalistaProbabilidade(setor, numero);
+        Analista analista = this.inicializador.getAnalistaProbabilidade(setor, probabilidade);
         
         return analista;        
+        
+    }
+    
+    public int obterTempo(Analista analista, Boolean urgencia) {
+        
+        double probabilidade = Math.random();  
+            
+        int tempo = this.inicializador.getTempoProbabilidade(analista, urgencia, probabilidade);
+        
+        return tempo;        
+        
+    }
+    
+    public Date[] obterDatas(Analista analista, int dias) {
+           
+        Date[] datas = this.inicializador.getDatasAnalista(analista, dias);
+        
+        return datas;        
         
     }
     
@@ -363,5 +481,5 @@ public class Simulador {
         
         return urgencia;
     }
- 
+
 }

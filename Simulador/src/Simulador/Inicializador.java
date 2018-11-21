@@ -4,16 +4,22 @@ package Simulador;
 import Componentes.ProbabilidadeTempo;
 import Componentes.ProbabilidadeAnalista;
 import Componentes.Analista;
+import Componentes.DataAnalista;
 import Componentes.Setor;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 public class Inicializador {
 
-    private ArrayList setores = new ArrayList<Setor>();
-    private ArrayList analistas = new ArrayList<Analista>();
-    private ArrayList probabilidadesAnalista = new ArrayList<ProbabilidadeAnalista>();
-    private ArrayList probabilidadesTempo = new ArrayList<ProbabilidadeTempo>();
+    private ArrayList setores = new ArrayList();
+    private ArrayList analistas = new ArrayList();
+    private ArrayList probabilidadesAnalista = new ArrayList();
+    private ArrayList probabilidadesTempo = new ArrayList();
+    private ArrayList datasAnalistas = new ArrayList();
 
     public Inicializador() throws IOException {
         
@@ -744,6 +750,35 @@ public class Inicializador {
                         this.getAnalistaNome("Ronaldo"), 0.0000, 0.0000));
     }
     
+    public void iniciarDatasAnalistas(String dataTexto) throws ParseException {
+
+        SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
+        Date data = formato.parse(dataTexto);
+        
+        Calendar c = Calendar.getInstance();
+                
+        c.setTime(data);
+        // Caso esse dia seja um sábado ou domingo, joga pra segunda
+        while(
+            (c.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) ||
+            (c.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) )
+        {
+            System.out.println("Ajustando a data para iniciar na segunda-feira...");
+            c.add(Calendar.DATE, 1);
+        }                
+        
+        Date dataAjustada = c.getTime();        
+        
+        this.datasAnalistas.add(
+                new DataAnalista(this.getAnalistaNome("Adair"), data));
+        this.datasAnalistas.add(
+                new DataAnalista(this.getAnalistaNome("Joao"), data));
+        this.datasAnalistas.add(
+                new DataAnalista(this.getAnalistaNome("Maria"), data));
+        this.datasAnalistas.add(
+                new DataAnalista(this.getAnalistaNome("Ronaldo"), data));
+    }
+    
     public Setor getSetorId(int id) {
         return (Setor) this.getSetores().get(id);
     }
@@ -813,17 +848,17 @@ public class Inicializador {
     public Analista getAnalistaProbabilidade(Setor setor, double probabilidade) {
         
         double soma = 0;
-        
-        for (int x = 0; x <= probabilidadesAnalista.size(); x++) {
+
+        for (int x = 0; x < probabilidadesAnalista.size(); x++) {
 
             ProbabilidadeAnalista probAnalista = (ProbabilidadeAnalista) probabilidadesAnalista.get(x);
-            
+
             if(probAnalista.getSetor().equals(setor))
             {
                 soma += probAnalista.getProbabilidade();
                 
                 if(probabilidade <= soma) {
-                    //System.out.println("CHAVE ENCONTRADA: "+chaveAtual);
+                    //System.out.println(probAnalista.getAnalista().getNome());
                     return probAnalista.getAnalista();
                 }
             }           
@@ -831,6 +866,92 @@ public class Inicializador {
         }
         
         return null;
+    }
+    
+    public Date[] getDatasAnalista(Analista analista, int dias) {
+        
+        for (int x = 0; x < datasAnalistas.size(); x++) {
+
+            DataAnalista dataAnalista = (DataAnalista) datasAnalistas.get(x);
+            
+            if(dataAnalista.getAnalista().equals(analista))
+            {
+                Date dataInicial = dataAnalista.getData();
+                
+                //////////////
+                // Seria interessante pensar em um teste de incrementar dias apenas úteis
+                // Não acham???
+                //////////////
+                
+                Calendar c = Calendar.getInstance();
+                
+                // Configura a data final de atendimento
+                c.setTime(dataInicial);
+                c.add(Calendar.DATE, dias);
+                // Caso esse dia seja um sábado ou domingo, joga pra segunda
+                while(
+                    (c.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) ||
+                    (c.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) )
+                {
+                    c.add(Calendar.DATE, 1);
+                }                
+                Date dataFinal = c.getTime();
+
+                // Configura pro próximo atendimento iniciar no dia seguinte
+                c.setTime(dataFinal);
+                c.add(Calendar.DATE, 1);
+                // Caso esse dia seja um sábado ou domingo, joga pra segunda
+                while(
+                    (c.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) ||
+                    (c.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) )
+                {
+                    c.add(Calendar.DATE, 1);
+                }
+                dataAnalista.setData(c.getTime());
+                
+                Date[] datas = new Date[2];
+                datas[0] = dataInicial;
+                datas[1] = dataFinal;
+                
+                return datas;
+            }           
+
+        }
+        
+        return null;
+    }
+    
+    public int getTempoProbabilidade(Analista analista, Boolean urgencia, double probabilidade) {
+        
+        double soma = 0;
+        
+        for (int x = 0; x < probabilidadesTempo.size(); x++) {
+
+            ProbabilidadeTempo probTempo = (ProbabilidadeTempo) probabilidadesTempo.get(x);
+            
+            if(probTempo.getAnalista().equals(analista))
+            {
+                if(urgencia.equals(Boolean.TRUE)) {
+                    soma += probTempo.getProbUrgente();
+                } else if(urgencia.equals(Boolean.FALSE)) {
+                    soma += probTempo.getProbUrgente();
+                }
+                    
+                if(probabilidade <= soma) {
+                    
+                    // Pega o número de dias sorteado e sorteia um número exato de dias
+                    // Por exemplo, se a probabilidade deu 15, ele vai sortear um número de dias entre 11 e 15.
+                    double min = Math.ceil(probTempo.getDias()-4);
+                    double max = Math.floor(probTempo.getDias());
+                    double tempo = Math.floor(Math.random() * (max - min + 1)) + min;   
+                    
+                    return (int) tempo;
+                } 
+            }           
+
+        }
+        
+        return 0;
     }
     
 }

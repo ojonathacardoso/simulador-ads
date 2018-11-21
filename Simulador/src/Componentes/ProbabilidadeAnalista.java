@@ -10,7 +10,7 @@ public class ProbabilidadeAnalista {
     public ProbabilidadeAnalista(Setor setor, Analista analista, double probabilidade){
         this.setor = setor;
         this.analista = analista;
-        this.probabilidade = this.probabilidade;
+        this.probabilidade = probabilidade;
     }
 
     public Setor getSetor() {
